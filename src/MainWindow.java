@@ -16,9 +16,10 @@ import javax.swing.event.ChangeListener;
 public class MainWindow extends JPanel {
 
     private final Game game;
-    private final Timer timer;
+    private final Timer evolveTimer;
+    private final Timer paintTimer;
     private final int SPEED_MIN = 0;
-    private final int SPEED_MAX = 50;
+    private final int SPEED_MAX = 500;
     private final int SPEED_INIT = 25;
 
     public MainWindow() {
@@ -36,11 +37,11 @@ public class MainWindow extends JPanel {
                 if (game.isRunning()) {
                     game.pause();
                     startButton.setText("Resume");
-                    timer.stop();
+                    evolveTimer.stop();
                 } else {
                     game.resume();
                     startButton.setText("Pause");
-                    timer.start();
+                    evolveTimer.start();
                 }
             }
         });
@@ -52,7 +53,7 @@ public class MainWindow extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 startButton.setText("Start");
                 game.reset();
-                timer.stop();
+                evolveTimer.stop();
                 repaint();
             }
         });
@@ -62,18 +63,25 @@ public class MainWindow extends JPanel {
         add(game, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.SOUTH);
 
-        timer = new Timer(1000 / SPEED_INIT, new ActionListener() {
+        evolveTimer = new Timer(1000 / SPEED_INIT, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 game.nextGeneration();
                 if (!game.isAlive()) {
-                    timer.stop();
+                    evolveTimer.stop();
                     game.reset();
                     startButton.setText("Start");
                 }
+            }
+        });
+        
+        paintTimer = new Timer(1000 / 30, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
                 repaint();
             }
         });
+        paintTimer.start();
 
         JSlider framesPerSecond = new JSlider(JSlider.HORIZONTAL, SPEED_MIN, SPEED_MAX, SPEED_INIT);
         framesPerSecond.addChangeListener(new ChangeListener() {
@@ -82,12 +90,12 @@ public class MainWindow extends JPanel {
                 JSlider source = (JSlider) e.getSource();
                 int fps = source.getValue();
                 if (fps == 0) {
-                    timer.stop();
+                    evolveTimer.stop();
                 } else {
                     int speed = 1000 / fps;
-                    timer.setDelay(speed);
+                    evolveTimer.setDelay(speed);
                     if (game.running) {
-                        timer.start();
+                        evolveTimer.start();
                     }
                 }
             }

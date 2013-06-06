@@ -8,18 +8,26 @@ import javax.swing.JPanel;
 @SuppressWarnings("serial")
 public class Game extends JPanel {
 
+    private final int worldWidth = 200;
+    private final int worldHeight = 150;
+    private final int cellSize = 10;
+
+    boolean running = false;
+    private boolean[][] cells = new boolean[worldWidth][worldHeight];
+    private boolean stillAlive;
+
     Game() {
         addMouseListener(new MouseListener() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            }
-
             @Override
             public void mousePressed(MouseEvent e) {
                 if (!running) {
                     cells[e.getX() / cellSize][e.getY() / cellSize] = !cells[e.getX() / cellSize][e.getY() / cellSize];
                     repaint();
                 }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
             }
 
             @Override
@@ -34,15 +42,8 @@ public class Game extends JPanel {
             public void mouseClicked(MouseEvent e) {
             }
         });
+        setDoubleBuffered(true);
     }
-
-    private final int worldWidth = 1000;
-    private final int worldHeight = 1000;
-    private final int cellSize = 10;
-
-    boolean running = false;
-    private boolean[][] cells = new boolean[worldWidth][worldHeight];
-    private boolean stillAlive;
 
     public void reset() {
         cells = new boolean[worldWidth][worldHeight];
@@ -91,29 +92,27 @@ public class Game extends JPanel {
 
     private int nearbyCells(int x, int y) {
         int nearbyCells = 0;
-        if ((x - 1) > 0 && (y - 1) > 0 && cells[x - 1][y - 1] == true)
-            nearbyCells++;
-        if ((y - 1) > 0 && cells[x][y - 1] == true)
-            nearbyCells++;
-        if ((x + 1 < worldWidth) && (y - 1) > 0 && cells[x + 1][y - 1] == true)
-            nearbyCells++;
+        if ((x - 1) > 0 && (y - 1) > 0 && cells[x - 1][y - 1] == true) nearbyCells++;
+        if ((y - 1) > 0 && cells[x][y - 1] == true) nearbyCells++;
+        if ((x + 1 < worldWidth) && (y - 1) > 0 && cells[x + 1][y - 1] == true) nearbyCells++;
 
-        if ((x - 1) > 0 && cells[x - 1][y] == true)
-            nearbyCells++;
-        if ((x + 1 < worldWidth) && cells[x + 1][y] == true)
-            nearbyCells++;
+        if ((x - 1) > 0 && cells[x - 1][y] == true) nearbyCells++;
+        if ((x + 1 < worldWidth) && cells[x + 1][y] == true) nearbyCells++;
 
-        if ((x - 1) > 0 && (y + 1) < worldHeight && cells[x - 1][y + 1] == true)
-            nearbyCells++;
-        if ((y - 1) > 0 && (y + 1) < worldHeight && cells[x][y + 1] == true)
-            nearbyCells++;
-        if ((x + 1 < worldWidth) && (y + 1) < worldHeight && cells[x + 1][y + 1] == true)
-            nearbyCells++;
+        if ((x - 1) > 0 && (y + 1) < worldHeight && cells[x - 1][y + 1] == true) nearbyCells++;
+        if ((y - 1) > 0 && (y + 1) < worldHeight && cells[x][y + 1] == true) nearbyCells++;
+        if ((x + 1 < worldWidth) && (y + 1) < worldHeight && cells[x + 1][y + 1] == true) nearbyCells++;
 
         return nearbyCells;
     }
 
-    public void draw(Graphics g) {
+    private boolean isAlive(int x, int y) {
+        return cells[x][y];
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
         g.setColor(Color.LIGHT_GRAY);
         for (int x = 0; x < getWidth(); x += cellSize) {
             g.drawLine(x, 0, x, getHeight());
@@ -129,16 +128,6 @@ public class Game extends JPanel {
                 }
             }
         }
-    }
-
-    private boolean isAlive(int x, int y) {
-        return cells[x][y];
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        draw(g);
     }
 }
 
