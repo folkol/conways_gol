@@ -16,8 +16,10 @@ public class Game extends JPanel {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                cells[e.getX() / cellSize][e.getY() / cellSize] = !cells[e.getX() / cellSize][e.getY() / cellSize];
-                repaint();
+                if (!running) {
+                    cells[e.getX() / cellSize][e.getY() / cellSize] = !cells[e.getX() / cellSize][e.getY() / cellSize];
+                    repaint();
+                }
             }
 
             @Override
