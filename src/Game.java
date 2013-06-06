@@ -1,17 +1,45 @@
 import java.awt.Graphics;
-import java.util.Random;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
 public class Game extends JPanel {
 
+    Game() {
+        addMouseListener(new MouseListener() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                cells[e.getX() / cellSize][e.getY() / cellSize] = true;
+                repaint();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+            }
+        });
+    }
+
     private final int worldWidth = 1000;
     private final int worldHeight = 1000;
+    private final int cellSize = 10;
 
     boolean running = true;
     private boolean[][] cells = new boolean[worldWidth][worldHeight];
-    private final Random random = new Random();
+    private boolean stillAlive;
 
     public void reset() {
         cells = new boolean[worldWidth][worldHeight];
@@ -33,26 +61,67 @@ public class Game extends JPanel {
 
     public void nextGeneration() {
         boolean[][] nextGen = new boolean[worldWidth][worldHeight];
+        stillAlive = false;
         for (int x = 1; x < worldWidth; x++) {
             for (int y = 0; y < worldHeight; y++) {
-                nextGen[x][y] = cells[x - 1][y];
+                int neighbours = nearbyCells(x, y);
+                if (cells[x][y] == true && neighbours < 2) {
+                    nextGen[x][y] = false;
+                } else if (cells[x][y] == true && neighbours > 1 && neighbours < 4) {
+                    nextGen[x][y] = true;
+                } else if (cells[x][y] == true && neighbours > 3) {
+                    nextGen[x][y] = false;
+                } else if (cells[x][y] == false && neighbours == 3) {
+                    nextGen[x][y] = true;
+                }
+                if (cells[x][y] != nextGen[x][y]) {
+                    stillAlive = true;
+                }
             }
         }
-        nextGen[0][random.nextInt(worldHeight)] = true;
+
         cells = nextGen;
     }
 
+    public boolean isAlive() {
+        return stillAlive;
+    }
+
+    private int nearbyCells(int x, int y) {
+        int nearbyCells = 0;
+        if ((x - 1) > 0 && (y - 1) > 0 && cells[x - 1][y - 1] == true)
+            nearbyCells++;
+        if ((y - 1) > 0 && cells[x][y - 1] == true)
+            nearbyCells++;
+        if ((x + 1 < worldWidth) && (y - 1) > 0 && cells[x + 1][y - 1] == true)
+            nearbyCells++;
+
+        if ((x - 1) > 0 && cells[x - 1][y] == true)
+            nearbyCells++;
+        if ((x + 1 < worldWidth) && cells[x + 1][y] == true)
+            nearbyCells++;
+
+        if ((x - 1) > 0 && (y + 1) < worldHeight && cells[x - 1][y + 1] == true)
+            nearbyCells++;
+        if ((y - 1) > 0 && (y + 1) < worldHeight && cells[x][y + 1] == true)
+            nearbyCells++;
+        if ((x + 1 < worldWidth) && (y + 1) < worldHeight && cells[x + 1][y + 1] == true)
+            nearbyCells++;
+
+        return nearbyCells;
+    }
+
     public void draw(Graphics g) {
-        for (int x = 0; x < getWidth(); x+=5) {
+        for (int x = 0; x < getWidth(); x += cellSize) {
             g.drawLine(x, 0, x, getHeight());
         }
-        for (int y = 0; y < getHeight(); y+=5) {
+        for (int y = 0; y < getHeight(); y += cellSize) {
             g.drawLine(0, y, getWidth(), y);
         }
         for (int x = 0; x < worldWidth; x++) {
             for (int y = 0; y < worldHeight; y++) {
                 if (isAlive(x, y)) {
-                    g.fillRect(x * 5, y * 5, 5, 5);
+                    g.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
                 }
             }
         }
@@ -77,7 +146,7 @@ class Coords {
         this.x = x;
         this.y = y;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 1;

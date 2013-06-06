@@ -26,7 +26,7 @@ public class MainWindow extends JPanel {
         final JButton startButton = new JButton("Start");
         startButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent arg0) {
+            public void actionPerformed(ActionEvent e) {
                 if (game.isRunning()) {
                     startButton.setText("Resume");
                     timer.stop();
@@ -41,7 +41,7 @@ public class MainWindow extends JPanel {
         final JButton resetButton = new JButton("Reset");
         resetButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent arg0) {
+            public void actionPerformed(ActionEvent e) {
                 startButton.setText("Start");
                 game.reset();
                 timer.stop();
@@ -58,6 +58,11 @@ public class MainWindow extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 game.nextGeneration();
+                if (!game.isAlive()) {
+                    timer.stop();
+                    game.reset();
+                    startButton.setText("Start");
+                }
                 repaint();
             }
         });
