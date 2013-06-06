@@ -28,9 +28,11 @@ public class MainWindow extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (game.isRunning()) {
+                    game.pause();
                     startButton.setText("Resume");
                     timer.stop();
                 } else {
+                    game.resume();
                     startButton.setText("Pause");
                     timer.start();
                 }

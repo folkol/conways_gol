@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -15,7 +16,7 @@ public class Game extends JPanel {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                cells[e.getX() / cellSize][e.getY() / cellSize] = true;
+                cells[e.getX() / cellSize][e.getY() / cellSize] = !cells[e.getX() / cellSize][e.getY() / cellSize];
                 repaint();
             }
 
@@ -37,7 +38,7 @@ public class Game extends JPanel {
     private final int worldHeight = 1000;
     private final int cellSize = 10;
 
-    boolean running = true;
+    boolean running = false;
     private boolean[][] cells = new boolean[worldWidth][worldHeight];
     private boolean stillAlive;
 
@@ -47,7 +48,6 @@ public class Game extends JPanel {
     }
 
     public boolean isRunning() {
-        running = !running;
         return running;
     }
 
@@ -112,12 +112,14 @@ public class Game extends JPanel {
     }
 
     public void draw(Graphics g) {
+        g.setColor(Color.LIGHT_GRAY);
         for (int x = 0; x < getWidth(); x += cellSize) {
             g.drawLine(x, 0, x, getHeight());
         }
         for (int y = 0; y < getHeight(); y += cellSize) {
             g.drawLine(0, y, getWidth(), y);
         }
+        g.setColor(Color.GREEN);
         for (int x = 0; x < worldWidth; x++) {
             for (int y = 0; y < worldHeight; y++) {
                 if (isAlive(x, y)) {
