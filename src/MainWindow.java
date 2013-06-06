@@ -54,10 +54,31 @@ public class MainWindow extends JPanel {
                 startButton.setText("Start");
                 game.reset();
                 evolveTimer.stop();
-                repaint();
             }
         });
         controlPanel.add(resetButton);
+
+        final JButton clearButton = new JButton("Clear");
+        clearButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                startButton.setText("Start");
+                game.clear();
+                game.reset();
+                evolveTimer.stop();
+            }
+        });
+        controlPanel.add(clearButton);
+
+        final JButton saveButton = new JButton("Save");
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                startButton.setText("Start");
+                game.save();
+            }
+        });
+        controlPanel.add(saveButton);
 
         setLayout(new BorderLayout());
         add(game, BorderLayout.CENTER);

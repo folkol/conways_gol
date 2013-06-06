@@ -14,6 +14,7 @@ public class Game extends JPanel {
 
     boolean running = false;
     private boolean[][] cells = new boolean[worldWidth][worldHeight];
+    private boolean[][] savedState = new boolean[worldWidth][worldHeight];
     private boolean stillAlive;
 
     Game() {
@@ -46,7 +47,11 @@ public class Game extends JPanel {
     }
 
     public void reset() {
-        cells = new boolean[worldWidth][worldHeight];
+        for (int x = 1; x < worldWidth; x++) {
+            for (int y = 0; y < worldHeight; y++) {
+                cells[x][y] = savedState[x][y];
+            }
+        }
         running = false;
     }
 
@@ -126,6 +131,18 @@ public class Game extends JPanel {
                 if (isAlive(x, y)) {
                     g.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
                 }
+            }
+        }
+    }
+
+    public void clear() {
+        savedState = new boolean[worldWidth][worldHeight];
+    }
+
+    public void save() {
+        for (int x = 1; x < worldWidth; x++) {
+            for (int y = 0; y < worldHeight; y++) {
+                savedState[x][y] = cells[x][y];
             }
         }
     }
