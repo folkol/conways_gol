@@ -7,20 +7,21 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 
 @SuppressWarnings("serial")
 public class MainWindow extends JPanel {
 
     private final Game game;
+    private final Timer timer;
 
     public MainWindow() {
         game = new Game();
 
-        JPanel canvas = new JPanel();
-        JPanel controls = new JPanel();
+        JPanel controlPanel = new JPanel();
 
-        canvas.setBorder(BorderFactory.createEmptyBorder());
-        controls.setBorder(BorderFactory.createBevelBorder(0));
+        game.setBorder(BorderFactory.createEmptyBorder());
+        controlPanel.setBorder(BorderFactory.createBevelBorder(0));
 
         final JButton startButton = new JButton("Start");
         startButton.addActionListener(new ActionListener() {
@@ -28,12 +29,14 @@ public class MainWindow extends JPanel {
             public void actionPerformed(ActionEvent arg0) {
                 if (game.isRunning()) {
                     startButton.setText("Resume");
+                    timer.stop();
                 } else {
                     startButton.setText("Pause");
+                    timer.start();
                 }
             }
         });
-        controls.add(startButton);
+        controlPanel.add(startButton);
 
         final JButton resetButton = new JButton("Reset");
         resetButton.addActionListener(new ActionListener() {
@@ -41,13 +44,23 @@ public class MainWindow extends JPanel {
             public void actionPerformed(ActionEvent arg0) {
                 startButton.setText("Start");
                 game.reset();
+                timer.stop();
+                repaint();
             }
         });
-        controls.add(resetButton);
+        controlPanel.add(resetButton);
 
         setLayout(new BorderLayout());
-        add(canvas, BorderLayout.CENTER);
-        add(controls, BorderLayout.SOUTH);
+        add(game, BorderLayout.CENTER);
+        add(controlPanel, BorderLayout.SOUTH);
+        
+        timer = new Timer(50, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                game.nextGeneration();
+                repaint();
+            }
+        });
     }
 
     public static void main(String[] args) {
