@@ -7,13 +7,19 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.Timer;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 @SuppressWarnings("serial")
 public class MainWindow extends JPanel {
 
     private final Game game;
     private final Timer timer;
+    private final int SPEED_MIN = 0;
+    private final int SPEED_MAX = 50;
+    private final int SPEED_INIT = 25;
 
     public MainWindow() {
         game = new Game();
@@ -55,8 +61,8 @@ public class MainWindow extends JPanel {
         setLayout(new BorderLayout());
         add(game, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.SOUTH);
-        
-        timer = new Timer(50, new ActionListener() {
+
+        timer = new Timer(1000 / SPEED_INIT, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 game.nextGeneration();
@@ -68,6 +74,25 @@ public class MainWindow extends JPanel {
                 repaint();
             }
         });
+
+        JSlider framesPerSecond = new JSlider(JSlider.HORIZONTAL, SPEED_MIN, SPEED_MAX, SPEED_INIT);
+        framesPerSecond.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                JSlider source = (JSlider) e.getSource();
+                int fps = source.getValue();
+                if (fps == 0) {
+                    timer.stop();
+                } else {
+                    int speed = 1000 / fps;
+                    timer.setDelay(speed);
+                    if (game.running) {
+                        timer.start();
+                    }
+                }
+            }
+        });
+        controlPanel.add(framesPerSecond);
     }
 
     public static void main(String[] args) {
