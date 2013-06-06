@@ -1,6 +1,4 @@
 import java.awt.Graphics;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 import javax.swing.JPanel;
@@ -8,12 +6,15 @@ import javax.swing.JPanel;
 @SuppressWarnings("serial")
 public class Game extends JPanel {
 
+    private final int worldWidth = 1000;
+    private final int worldHeight = 1000;
+
     boolean running = true;
-    private Map<Coords, Boolean> cells = new HashMap<Coords, Boolean>();
+    private boolean[][] cells = new boolean[worldWidth][worldHeight];
     private final Random random = new Random();
 
     public void reset() {
-        cells.clear();
+        cells = new boolean[worldWidth][worldHeight];
         running = false;
     }
 
@@ -31,29 +32,34 @@ public class Game extends JPanel {
     }
 
     public void nextGeneration() {
-        Map<Coords, Boolean> nextGen = new HashMap<Coords, Boolean>();
-        for (Coords c : cells.keySet()) {
-            nextGen.put(new Coords(c.x + 1, c.y), true);
+        boolean[][] nextGen = new boolean[worldWidth][worldHeight];
+        for (int x = 1; x < worldWidth; x++) {
+            for (int y = 0; y < worldHeight; y++) {
+                nextGen[x][y] = cells[x - 1][y];
+            }
         }
-        Coords coords = new Coords(0, random.nextInt(getHeight() / 5));
-        nextGen.put(coords, true);
+        nextGen[0][random.nextInt(worldHeight)] = true;
         cells = nextGen;
     }
 
     public void draw(Graphics g) {
-        for (int x = 0; x < getWidth() / 5; x++) {
-            for (int y = 0; y < getHeight() / 5; y++) {
+        for (int x = 0; x < getWidth(); x+=5) {
+            g.drawLine(x, 0, x, getHeight());
+        }
+        for (int y = 0; y < getHeight(); y+=5) {
+            g.drawLine(0, y, getWidth(), y);
+        }
+        for (int x = 0; x < worldWidth; x++) {
+            for (int y = 0; y < worldHeight; y++) {
                 if (isAlive(x, y)) {
                     g.fillRect(x * 5, y * 5, 5, 5);
-                } else {
-                    g.drawRect(x * 5, y * 5, 5, 5);
                 }
             }
         }
     }
 
     private boolean isAlive(int x, int y) {
-        return cells.get(new Coords(x, y)) != null;
+        return cells[x][y];
     }
 
     @Override
